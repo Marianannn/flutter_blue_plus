@@ -141,6 +141,7 @@ class _ScanScreenState extends State<ScanScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Find Devices'),
+          backgroundColor: Colors.blue,
         ),
         body: RefreshIndicator(
           onRefresh: onRefresh,

@@ -241,6 +241,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       key: Snackbar.snackBarKeyC,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.blue,
           title: Text(widget.device.platformName),
           actions: [buildConnectButton(context)],
         ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -42,14 +43,32 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
 
   BluetoothCharacteristic get c => widget.characteristic;
 
+  String transformaParaString(List<int> _value) {
+    const asciiDecoder = AsciiDecoder(allowInvalid: true);
+    var resultado = asciiDecoder.convert(_value);
+    print("\n\t");
+    print(resultado);
+    return resultado;
+  }
+
   List<int> _getRandomBytes() {
     final math = Random();
     return [math.nextInt(255), math.nextInt(255), math.nextInt(255), math.nextInt(255)];
   }
 
+  Future onValuePressed() async {
+    try {
+      await c.read();
+      Snackbar.show(ABC.c, "Read Value: Success", success: true);
+    } catch (e) {
+      Snackbar.show(ABC.c, prettyException("Read Value Error:", e), success: false);
+    }
+  }
+
   Future onReadPressed() async {
     try {
       await c.read();
+      transformaParaString(_value);
       Snackbar.show(ABC.c, "Read: Success", success: true);
     } catch (e) {
       Snackbar.show(ABC.c, prettyException("Read Error:", e), success: false);
@@ -58,7 +77,17 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
 
   Future onWritePressed() async {
     try {
-      await c.write(_getRandomBytes(), withoutResponse: c.properties.writeWithoutResponse);
+      await c.write([0x6f, 0x6c, 0x61, 0x20, 0x6d, 0x75, 0x6e, 0x64, 0x6f, 0x2e, 0x20
+]);// esses numeros a seguir querem dizer "ola mundo."
+      // await c.write([0x61, 0x61, 0x61]);
+      // ^^esse aqui é o valor em hexa de um caracter ascii.
+      // Nesse caso, ele represe97nta o caracter "a",
+      // o qual possui o hexa 0x61 e o decimal 97,
+      // como é exibido no widget se rodar o código dessa forma
+
+      // transformaParaString(_value);
+
+      // await c.write(_getRandomBytes(), withoutResponse: c.properties.writeWithoutResponse);
       Snackbar.show(ABC.c, "Write: Success", success: true);
       if (c.properties.read) {
         await c.read();
@@ -103,6 +132,21 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
             setState(() {});
           }
         });
+  }
+
+  Widget buildValueMessage(BuildContext context) {
+    String _resultado = transformaParaString(_value);
+    if (_resultado == "") {
+      _resultado = "sem dado ainda";
+    }
+    return Container(
+      child: Text(
+        'Value: $_resultado ',
+        maxLines: 5,
+        selectionColor: Colors.amber,
+      ),
+      decoration: BoxDecoration(border: Border.all()),
+    );
   }
 
   Widget buildWriteButton(BuildContext context) {
@@ -155,6 +199,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
             const Text('Characteristic'),
             buildUuid(context),
             buildValue(context),
+            buildValueMessage(context),
           ],
         ),
         subtitle: buildButtonRow(context),

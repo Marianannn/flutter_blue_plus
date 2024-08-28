@@ -17,6 +17,7 @@ class DescriptorTile extends StatefulWidget {
 
 class _DescriptorTileState extends State<DescriptorTile> {
   List<int> _value = [];
+  String frase = "";
 
   late StreamSubscription<List<int>> _lastValueSubscription;
 
